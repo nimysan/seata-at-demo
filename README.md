@@ -3,6 +3,12 @@
 > 本示例基于Spring boot 2.2.8.RELEASE和seata-server(1.4.0) 版本， 不同版本配置差异较大，请注意
 
 
+## Seata模式说明
+1. AT 自动模式， 通过GlobalTransaction注解， 自动将关联事务注册到一个xid
+2. XA 基于XA模式的的事务， 与AT的编程模型完全相同，只是需要数据源切换为 XA DataSource proxy [XA Mode](https://seata.io/zh-cn/docs/dev/mode/xa-mode.html)
+3. TCC TRY-CONFIRM-CANCEL 自定义行为纳入事务框架
+4. SAGA SAGA标准
+
 ## 测试场景说明
 
 product服务为主服务， 该服务会写入数据进product表。 Product-mirror为product镜像服务，每次product的修改都期望同时修改这两个库。
