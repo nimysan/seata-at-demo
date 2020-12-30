@@ -19,6 +19,15 @@ public class ProductService {
     @Autowired
     private MirrorProductService mirrorProductService;
 
+    /**
+     *  @GlobalTransactional确保全局事务开始
+     *
+     *  @Transactional 确保本地事务支持
+     *
+     * @param productId
+     * @param name
+     * @return
+     */
     @GlobalTransactional
     @Transactional(rollbackFor = Exception.class)
     public Product createProduct(Integer productId, String name) {

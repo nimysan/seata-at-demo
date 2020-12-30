@@ -27,17 +27,58 @@ docker stack rm demonacos
 seata-server.bat
 ```   
 
+## 服务说明
 
-### 测试场景
-product-service: productName包含111得时候，会导致异常
-product-mirror-service: productName包含000得时候，会导致异常
+1. product: 新增/修改 数据库product表
+>> 当productName参数中含有111字符串的时候，会导致runtime exception (辅助测试)
 
-服务发起方在： product-service/ProductService.java 里面会先调用mirror的更新操作， 然后更新Product的local database.
+2. product-mirror: 新增/修改 数据库 product表
+
+>>当productName含000的时候，抛出runtime exception(辅助测试)
+
+```java
+  /**
+     *  @GlobalTransactional确保全局事务开始
+     *
+     *  @Transactional 确保本地事务支持
+     *
+     * @param productId
+     * @param name
+     * @return
+     */
+    @GlobalTransactional
+    @Transactional(rollbackFor = Exception.class)
+    public Product createProduct(Integer productId, String name) {
+
+
+        log.info("step1： create mirror product");
+        //调用外部服务创建
+        mirrorProductService.createProduct(productId, name);
+
+        log.info("step2： create local product");
+        //真实创建
+        Product product = new Product();
+        product.setId(productId);
+        product.setName(name);
+
+        productRepository.save(product);
+
+        mockForException(name);
+
+        return product;
+    }
+```
+
+### 期望结果
+
+product/product-mirror各自的数据库中，相同productId的productName保持一致。
+
+
+#### 测试工具(最好用postman)
 
 ```
-curl -X PUT "http://localhost:7075/products/1001?productName=producta_correct111"
+PUT "http://localhost:7075/products/1001?productName=producta_correct111"
 
-curl -X POST "http://localhost:7075/products?productId=1001&productName=product-a"
+POST "http://localhost:7075/products?productId=1001&productName=product-a"
 ```
 
-###
