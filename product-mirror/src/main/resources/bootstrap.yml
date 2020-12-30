@@ -1,0 +1,32 @@
+server:
+  port: 7076
+
+logging:
+  level:
+    io.seata: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  application:
+    name: seatademo-product-mirror
+
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: vlueeseatademo-group #自定义事务组名称需要与seata-server中的对应
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+
+      config:
+        server-addr: localhost:8848
+        file-extension: properties
+

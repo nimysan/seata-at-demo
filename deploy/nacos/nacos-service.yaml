@@ -1,0 +1,34 @@
+version: "3"
+services:
+  nacos:
+    image: nacos/nacos-server:latest
+    environment:
+    - PREFER_HOST_MODE=hostname
+    - MODE=standalone
+    volumes:
+    - ./standalone-logs/:/home/nacos/logs
+    - ./init.d/custom.properties:/home/nacos/init.d/custom.properties
+    ports:
+      - "8848:8848"
+    networks:
+      - as-dev-swarm
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus-standalone.yaml:/etc/prometheus/prometheus.yml
+    expose:
+      - "9090"
+    depends_on:
+      - nacos
+    networks:
+      - as-dev-swarm
+  grafana:
+    image: grafana/grafana:latest
+    expose:
+      - "3000"
+    networks:
+      - as-dev-swarm
+
+networks:
+  as-dev-swarm:
+    external: true
